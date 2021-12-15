@@ -20,3 +20,10 @@ mongoose
     app.listen(port, () => console.log('listening on port: ' + port))
   })
   .catch(e => console.log(e))
+
+// const User = require('./models/user')
+// const user = new User({
+//   username: 'tuliofaria',
+//   password: 'abc123'
+// })
+// user.save(() => console.log('opa'))
