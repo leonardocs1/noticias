@@ -10,6 +10,7 @@ const mongo = process.env.MONGODB || 'mongodb://localhost/noticias'
 mongoose.Promise = global.Promise
 
 const User = require('./models/user')
+const Noticia = require('./models/noticia')
 
 const restrito = require('./routes/restrito')
 const noticias = require('./routes/noticias')
@@ -54,6 +55,20 @@ const createInitalUser = async () => {
   } else {
     console.log('user created skipped')
   }
+
+  const noticia = new Noticia({
+    title: 'Notícia Pública ' + new Date().getTime(),
+    content: 'Content',
+    category: 'public'
+  })
+  await noticia.save()
+
+  const noticia2 = new Noticia({
+    title: 'Notícia Privada ' + new Date().getTime(),
+    content: 'Content',
+    category: 'private'
+  })
+  await noticia2.save()
 }
 
 mongoose
