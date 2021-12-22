@@ -5,7 +5,8 @@ require('dotenv/config')
 
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
-const facebookStrategy = require('passport-facebook').Strategy
+const FacebookStrategy = require('passport-facebook').Strategy
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 
 router.use(passport.initialize())
 router.use(passport.session())
@@ -33,9 +34,9 @@ passport.use(new LocalStrategy(async (username, password, done) => {
 }))
 
 //facebook
-passport.use(new facebookStrategy({
-  clientID: process.env.CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET,
+passport.use(new FacebookStrategy({
+  clientID: process.env.FACEBOOK_CLIENT_ID,
+  clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
   callbackURL: 'http://localhost:3000/facebook/callback',
   profileFields: ['id', 'displayName', 'email', 'photos']
 }, async (acessToken, refreshToken, profile, done) => {
@@ -44,6 +45,26 @@ passport.use(new facebookStrategy({
     const user = new User({
       name: profile.displayName,
       facebookId: profile.id,
+      roles: ['restrito']
+    })
+    await user.save()
+    done(null, user)
+  } else {
+    done(null, userDB)
+  }
+}))
+
+// google
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: 'http://localhost:3000/google/callback',
+}, async (acessToken, refreshToken, err, profile, done) => {
+  const userDB = await User.findOne({ googleId: profile.id })
+  if (!userDB) {
+    const user = new User({
+      name: profile.displayName,
+      googleId: profile.id,
       roles: ['restrito']
     })
     await user.save()
@@ -98,5 +119,11 @@ router.get('/facebook/callback',
     res.redirect('/')
   }
 )
+
+router.get('/google', passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/userinfo.profile'] }))
+router.get('/google/callback', passport.authenticate('google', {
+  failureRedirect: '/',
+  successRedirect: '/'
+}))
 
 module.exports = router
