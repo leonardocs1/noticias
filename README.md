@@ -2,7 +2,7 @@
 
 Este projeto foi construído durante a Formação Fullstack Master do [DevPleno](https://devpleno.com). 
 
-Este projeto foi construído com o instuito de demonstrar a utilização de algumas formas de autenticação (Local, Facebook e Google). 
+O intuito deste projeto é demonstrar a utilização de algumas formas de autenticação (Local, Facebook e Google). 
 
 ![Preview](https://user-images.githubusercontent.com/31082603/147022219-4d1dea99-d73f-4c10-a9af-60c02cad992f.png)
 
@@ -16,11 +16,12 @@ Você precisa do NodeJS, NPM e do MongoDB instalado em sua máquina.
 npm install
 npm  start
 ```
+
 ## Criando as Credenciais:
 
 Para criar as credenciais para serem utilizadas com a Api do Google e Facebook, acesse os seguintes endereços: [Google](https://console.cloud.google.com) | [Facebook](https://developers.facebook.com/).
 
- É necessário criar as variáveis de ambiente para que o sistema funcione corretamente: 
+É necessário criar as variáveis de ambiente para que o sistema funcione corretamente: 
 
 ```
 FACEBOOK_CLIENT_ID = client_id do Facebook
