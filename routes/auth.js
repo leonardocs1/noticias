@@ -1,9 +1,11 @@
 const express = require('express')
 const router = express.Router()
 const User = require('../models/user')
+require('dotenv/config')
 
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
+const facebookStrategy = require('passport-facebook').Strategy
 
 router.use(passport.initialize())
 router.use(passport.session())
@@ -27,6 +29,27 @@ passport.use(new LocalStrategy(async (username, password, done) => {
     }
   } else {
     return done(null, false)
+  }
+}))
+
+//facebook
+passport.use(new facebookStrategy({
+  clientID: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+  callbackURL: 'http://localhost:3000/facebook/callback',
+  profileFields: ['id', 'displayName', 'email', 'photos']
+}, async (acessToken, refreshToken, profile, done) => {
+  const userDB = await User.findOne({ facebookId: profile.id })
+  if (!userDB) {
+    const user = new User({
+      name: profile.displayName,
+      facebookId: profile.id,
+      roles: ['restrito']
+    })
+    await user.save()
+    done(null, user)
+  } else {
+    done(null, userDB)
   }
 }))
 
@@ -65,12 +88,14 @@ router.post('/login', passport.authenticate('local', {
   failureRedirect: '/login',
   failureFlash: false
 }))
+router.get('/facebook', passport.authenticate('facebook'))
+
 
 router.get('/facebook', passport.authenticate('facebook'))
 router.get('/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/' }),
   (req, res) => {
-    req.redirect('/')
+    res.redirect('/')
   }
 )
 
